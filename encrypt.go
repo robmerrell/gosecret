@@ -71,29 +71,17 @@ func encrypt(key, contents []byte) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	iv := contents[:aes.BlockSize]
+	ciphertext := make([]byte, aes.BlockSize+len(contents))
+
+	// set the initialization vector
+	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return []byte{}, err
 	}
 
-	ciphertext := make([]byte, aes.BlockSize+len(contents))
+	// encrypt it
 	cfb := cipher.NewCFBEncrypter(block, iv)
 	cfb.XORKeyStream(ciphertext[aes.BlockSize:], contents)
 
 	return ciphertext, nil
 }
-
-// func decrypt(key, text []byte) []byte {
-// 	block, err := aes.NewCipher(key)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	if len(text) < aes.BlockSize {
-// 		panic("ciphertext too short")
-// 	}
-// 	iv := text[:aes.BlockSize]
-// 	text = text[aes.BlockSize:]
-// 	cfb := cipher.NewCFBDecrypter(block, iv)
-// 	cfb.XORKeyStream(text, text)
-// 	return decodeBase64(text)
-// }

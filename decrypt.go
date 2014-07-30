@@ -74,7 +74,6 @@ func decrypt(key, contents []byte) ([]byte, error) {
 	}
 
 	iv := contents[:aes.BlockSize]
-	// decrypted := make([]byte, len(contents)-aes.BlockSize)
 	decrypted := contents[aes.BlockSize:]
 	cfb := cipher.NewCFBDecrypter(block, iv)
 	cfb.XORKeyStream(decrypted, decrypted)
