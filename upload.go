@@ -91,13 +91,4 @@ func upload(bucket, file string, config *s3util.Config) error {
 	// copy the file
 	_, err = io.Copy(s3File, localFile)
 	return err
-	// if _, err = io.Copy(s3File, localFile); err != nil {
-	// 	return err
-	// }
-
-	// close the files
-	// if err = localFile.Close(); err != nil {
-	// 	return err
-	// }
-	// return s3File.Close()
 }
