@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/robmerrell/comandante"
+	"github.com/robmerrell/gosecret/vendor/github.com/robmerrell/comandante"
 	"os"
 )
 
