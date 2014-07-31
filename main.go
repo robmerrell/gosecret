@@ -32,6 +32,8 @@ func main() {
 	// upload
 	uploadCmd := comandante.NewCommand("upload", "Upload a file", uploadAction)
 	uploadCmd.Documentation = uploadDoc
+	uploadCmd.FlagInit = uploadFlagInit
+	uploadCmd.FlagPostParse = uploadFlagPostParse
 	bin.RegisterCommand(uploadCmd)
 
 	if err := bin.Run(); err != nil {

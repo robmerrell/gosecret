@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<InitiateMultipartUploadResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Bucket>pf-app-configs</Bucket><Key>TestFile</Key><UploadId>vUftX1.QqnFYE0cEFFoeD9CP4imt_kKTR2QnNRU6MLyog48kkaLoPXTNLWRgEEtSwN8MWi8mUhNVUNePR5kfV9VHpnZRxiNt8v8a0YzO3GOQfmM4wSDEv9z.EEABKGPR</UploadId></InitiateMultipartUploadResult>
