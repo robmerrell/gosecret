@@ -17,7 +17,7 @@ var decryptOutFilenameArg string
 var decryptDoc = `
 Usage: decrypt [options] in-file out-file
 
-Decrypt an input file using a keypair and write the results to an output file
+Decrypt an input file using a key and write the results to an output file
 `
 
 // decryptAction is the action invoked by comandante

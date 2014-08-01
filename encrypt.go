@@ -19,7 +19,7 @@ var encryptOutFilenameArg string
 var encryptDoc = `
 Usage: encrypt [options] in-file out-file
 
-Encrypt an input file using a keypair and write the results to an output file
+Encrypt an input file using a key and write the results to an output file
 `
 
 // encryptAction is the action invoked by comandante
