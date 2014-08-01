@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 // flags and args
@@ -82,7 +83,7 @@ func upload(bucket, file string, config *s3util.Config) error {
 
 	headers := http.Header{}
 	headers.Add("x-amz-acl", "private")
-	s3File, err := s3util.Create(generateS3Url(bucket, file), headers, config)
+	s3File, err := s3util.Create(generateS3Url(bucket, filepath.Base(file)), headers, config)
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -48,7 +49,7 @@ func TestUploadFlagPostParse(t *testing.T) {
 	uploadFlagPostParse(fs)
 
 	if uploadFilenameArg != filename {
-		t.Errorf("Got %s for filename, but expected %s", encryptInFilenameArg, filename)
+		t.Errorf("Got %s for filename, but expected %s", uploadFilenameArg, filename)
 	}
 }
 
@@ -80,4 +81,68 @@ func TestGenerateS3Url(t *testing.T) {
 	if url != validUrl {
 		t.Errorf("Didn't generate a correct URL. Expected %s, got %s", validUrl, url)
 	}
+}
+
+func TestDownload(t *testing.T) {
+	downloadRes, _ := ioutil.ReadFile("testdata/download_res")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, string(downloadRes))
+	}))
+	defer server.Close()
+
+	replaceUrl(server.URL+"/%s/%s", &s3hostFmt, func() {
+		// make sure the file doesn't already exist
+		testfile := "test_download_func"
+		_, err := os.Stat(testfile)
+		if err == nil {
+			os.Remove(testfile)
+		}
+
+		err = download("testbucket", testfile, nil)
+		if err != nil {
+			t.Errorf("Couldn't download file: %s", err)
+		}
+
+		downloadedFile, _ := ioutil.ReadFile(testfile)
+		if string(downloadedFile) != string(downloadRes) {
+			t.Error("Downloaded file doesn't match the test download file")
+		}
+		os.Remove(testfile)
+	})
+}
+
+func TestDownloadFlagPostParse(t *testing.T) {
+	filename := "plain"
+
+	fs := flag.NewFlagSet("name", flag.ExitOnError)
+	fs.Parse([]string{filename})
+
+	downloadFlagPostParse(fs)
+
+	if downloadFilenameArg != filename {
+		t.Errorf("Got %s for filename, but expected %s", downloadFilenameArg, filename)
+	}
+}
+
+func TestDownloadAction(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		downloadRes, _ := ioutil.ReadFile("testdata/download_res")
+		fmt.Fprint(w, string(downloadRes))
+	}))
+	defer server.Close()
+
+	filename := "test_download_action"
+	downloadBucketNameFlag = "testbucket"
+	downloadAccessKeyFlag = "testaccess"
+	downloadSecretKeyFlag = "testsecret"
+	downloadFilenameArg = filename
+
+	replaceUrl(server.URL+"/%s/%s", &s3hostFmt, func() {
+		err := downloadAction()
+		if err != nil {
+			t.Errorf("Couldn't download file: %s", err)
+		}
+
+		os.Remove(filename)
+	})
 }

@@ -27,6 +27,8 @@ func main() {
 	// download
 	downloadCmd := comandante.NewCommand("download", "Download a file", downloadAction)
 	downloadCmd.Documentation = downloadDoc
+	downloadCmd.FlagInit = downloadFlagInit
+	downloadCmd.FlagPostParse = downloadFlagPostParse
 	bin.RegisterCommand(downloadCmd)
 
 	// upload
