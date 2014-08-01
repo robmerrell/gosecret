@@ -98,7 +98,7 @@ func TestDownload(t *testing.T) {
 			os.Remove(testfile)
 		}
 
-		err = download("testbucket", testfile, nil)
+		err = download("testbucket", testfile, testfile, nil)
 		if err != nil {
 			t.Errorf("Couldn't download file: %s", err)
 		}

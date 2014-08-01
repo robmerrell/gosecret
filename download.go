@@ -15,17 +15,22 @@ var downloadBucketNameFlag string
 var downloadAccessKeyFlag string
 var downloadSecretKeyFlag string
 var downloadFilenameArg string
+var downloadDestinationFilenameArg string
 
 var downloadDoc = `
-Usage: download [options] file
+Usage: download [options] file [destination file]
 
-Download a file from an s3 bucket
+Download a file from an s3 bucket.
+If a destination file isn't specified the downloaded file will be named the same as the soruce file.
 `
 
 func downloadAction() error {
 	// make sure that we have all of the required data
 	if downloadFilenameArg == "" {
 		return errors.New("Please provide a valid filename to download")
+	}
+	if downloadDestinationFilenameArg == "" {
+		downloadDestinationFilenameArg = downloadFilenameArg
 	}
 	if downloadBucketNameFlag == "" {
 		return errors.New("Please provide an S3 bucket name with --bucket or $GOSECRET_BUCKET")
@@ -46,7 +51,7 @@ func downloadAction() error {
 		Service: s3.DefaultService,
 	}
 
-	return download(downloadBucketNameFlag, downloadFilenameArg, config)
+	return download(downloadBucketNameFlag, downloadFilenameArg, downloadDestinationFilenameArg, config)
 }
 
 // downloadFlagInit initializes the flagset for the download command
@@ -66,24 +71,28 @@ func downloadFlagPostParse(fs *flag.FlagSet) {
 	if filename := fs.Arg(0); filename != "" {
 		downloadFilenameArg = filename
 	}
+
+	if destFilename := fs.Arg(1); destFilename != "" {
+		downloadDestinationFilenameArg = destFilename
+	}
 }
 
 // download downloads a file from an s3 bucket.
-func download(bucket, file string, config *s3util.Config) error {
-	// open the local file to download to
-	localFile, err := os.Create(file)
-	if err != nil {
-		return err
-	}
-	defer localFile.Close()
-
+func download(bucket, sourceFile, destFile string, config *s3util.Config) error {
 	headers := http.Header{}
 	headers.Add("x-amz-acl", "private")
-	s3File, err := s3util.Open(generateS3Url(bucket, file), config)
+	s3File, err := s3util.Open(generateS3Url(bucket, sourceFile), config)
 	if err != nil {
 		return err
 	}
 	defer s3File.Close()
+
+	// open the local file to download to
+	localFile, err := os.Create(destFile)
+	if err != nil {
+		return err
+	}
+	defer localFile.Close()
 
 	// copy the file
 	_, err = io.Copy(localFile, s3File)
